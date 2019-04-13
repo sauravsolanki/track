@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity implements
             android.Manifest.permission.READ_PHONE_STATE,
     };
     private final String TAG = this.getClass().getName();
-    static double latitude = 0.000;
-    static double longitude = 0.000;
+    static double latitude;
+    static double longitude;
     String IMEI = "none";
     TextView tv;
     String time;
@@ -66,16 +66,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        tv = (TextView) findViewById(R.id.tv);
-
-        if (!hasPermissions(this, PERMISSIONS)) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
-        }
-//        checkCurrentUser();
-
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -97,12 +87,24 @@ public class MainActivity extends AppCompatActivity implements
                                             new AuthUI.IdpConfig.EmailBuilder().build(),
                                             new AuthUI.IdpConfig.GoogleBuilder().build(),
                                             new AuthUI.IdpConfig.PhoneBuilder().build()))
+                                    .setIsSmartLockEnabled(false)
                                     .build(),
                             RC_SIGN_IN);
                 }
 
             }
         };
+        setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        tv = (TextView) findViewById(R.id.tv);
+
+        if (!hasPermissions(this, PERMISSIONS)) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+        }
+//        checkCurrentUser();
+
+
 
         // Read from the database
 //        myRef.addValueEventListener(new ValueEventListener() {
@@ -209,9 +211,11 @@ public class MainActivity extends AppCompatActivity implements
                 LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 @SuppressLint("MissingPermission")
                 Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                longitude = location.getLongitude();
-                latitude = location.getLatitude();
-                Log.i(TAG, "getLocation: latitude :" + latitude + ", longitude: " + longitude);
+                if(location!=null){
+                    longitude = location.getLongitude();
+                    latitude = location.getLatitude();
+                    Log.i(TAG, "getLocation: latitude :" + latitude + ", longitude: " + longitude);
+                }
 
                 lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
             } else {
@@ -264,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements
         WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = manager.getConnectionInfo();
         String address = info.getMacAddress();
-        Toast.makeText(this, "Mac Address" + address, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Mac Address" + address, Toast.LENGTH_SHORT).show();
         Log.i(TAG, "getMACAddress: " + address);
 
         if (hasPermissions(this, PERMISSIONS)) {
@@ -274,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements
             String temp = telephonyManager.getDeviceId();
             IMEI = temp;
             Log.i(TAG, "getMACAddress: IMEI" + temp);
+//            Toast.makeText(this, "Mac Address" + address, Toast.LENGTH_SHORT).show();
         } else {
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
@@ -332,4 +337,5 @@ public class MainActivity extends AppCompatActivity implements
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 // TODO: 27/2/19 future work
     }
+
 }

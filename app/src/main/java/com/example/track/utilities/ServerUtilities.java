@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.example.track.user;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +25,7 @@ public class ServerUtilities {
 
     public static void sendToServer(double latitude,double longitude,String IMEI){
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        myRef = database.getReference("users").child(IMEI);
         Date date = new Date();
         String time = formatter.format(date);
         try{
@@ -47,7 +47,7 @@ public class ServerUtilities {
     public static double[] getFromLocal(Context context){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         double lat = prefs.getFloat(LATITUDE, DEFAULT_COUNT);
-        double lng = prefs.getFloat(LATITUDE, DEFAULT_COUNT);
+        double lng = prefs.getFloat(LONGITUDE, DEFAULT_COUNT);
         return new double[]{lat,lng};
     }
     public static void update(Context context, double latitude, double longitude,String imei){
